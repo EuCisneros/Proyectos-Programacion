@@ -69,69 +69,70 @@ vue.component('component-alumnos', {
                 };
             } else {
                 this.mostrarMsg('codigo alumno duplicado', true);
-            },
-            mostrarMsg(msg, error) {
-                    this.status = true;
-                    this.msg = msg;
-                    this.error = error;
-                    this.quitarMsg(3);
-                },
-                quitarMsg(time) {
-                    setTimeout(() => {
-                        this.status = true;
-                        this.msg = '',
-                            this.error = false;
-
-                    }, time * 1000);
-                },
-                Obtenerdatos() {
-
-                    let store = this.abrirStore('tblalumnos', 'readonly'),
-                        data = store.getAll();
-                    data.onsuccess = resp => {
-                        this.alumnos = data.result;
-                    };
-                    let storeInscripcion = this.abrirStore('tblinscripcion', 'readonly'),
-                        dataInscripcion = storeInscripcion.getAll();
-                    this.inscripciones = [];
-                    dataInscripcion.onsuccess = resp => {
-                        this.inscripciones.result.forEach(element => {
-                            this.inscripciones.push({ id: element.id, label: element.nombre });
-                        });
-                    };
-                },
-                limpiar() {
-                    this.accion = 'nuevo';
-                    this.alumno.categoria.id = 0;
-                    this.alumno.categoria.label = "";
-                    this.alumno.idalumno = '';
-                    this.alumno.codigo = '';
-                    this.alumno.nombre = '';
-                    this.alumno.fechan = '';
-                    this.alumno.genero = '';
-                    this.alumno.direccion = '';
-                    this.alumno.municipio = '';
-                    this.alumno.departamento = '';
-                    this.Obtenerdatos();
-                },
-                eliminarDatos(alu) {
-                    if (confirm('estas seguro eliminar: ${alu.nombre}')) {
-                        let store = this.abrirStore("tblalumnos", 'readwrite'),
-                            req = store.delete(alu.idalumno);
-                        req.onsuccess = resp => {
-                            this.mostrarMsg('registrado', true);
-                            this.Obtenerdatos();
-                        };
-                    }
-                },
-                abrirStore(store, modo) {
-                    let tx = db.transaction(store);
-                }
+            }
         },
-        create() {
+        mostrarMsg(msg, error) {
+            this.status = true;
+            this.msg = msg;
+            this.error = error;
+            this.quitarMsg(3);
+        },
+        quitarMsg(time) {
+            setTimeout(() => {
+                this.status = true;
+                this.msg = '',
+                    this.error = false;
 
+            }, time * 1000);
+        },
+        Obtenerdatos() {
+
+            let store = this.abrirStore('tblalumnos', 'readonly'),
+                data = store.getAll();
+            data.onsuccess = resp => {
+                this.alumnos = data.result;
+            };
+            let storeInscripcion = this.abrirStore('tblinscripcion', 'readonly'),
+                dataInscripcion = storeInscripcion.getAll();
+            this.inscripciones = [];
+            dataInscripcion.onsuccess = resp => {
+                this.inscripciones.result.forEach(element => {
+                    this.inscripciones.push({ id: element.id, label: element.nombre });
+                });
+            };
+        },
+        limpiar() {
+            this.accion = 'nuevo';
+            this.alumno.categoria.id = 0;
+            this.alumno.categoria.label = "";
+            this.alumno.idalumno = '';
+            this.alumno.codigo = '';
+            this.alumno.nombre = '';
+            this.alumno.fechan = '';
+            this.alumno.genero = '';
+            this.alumno.direccion = '';
+            this.alumno.municipio = '';
+            this.alumno.departamento = '';
+            this.Obtenerdatos();
+        },
+        eliminarDatos(alu) {
+            if (confirm('estas seguro eliminar: ${alu.nombre}')) {
+                let store = this.abrirStore("tblalumnos", 'readwrite'),
+                    req = store.delete(alu.idalumno);
+                req.onsuccess = resp => {
+                    this.mostrarMsg('registrado', true);
+                    this.Obtenerdatos();
+                };
+            }
+        },
+        abrirStore(store, modo) {
+            let tx = db.transaction(store);
         }
-    }
-}
+    },
+    create() {
+
+    },
+
+
 
 });
