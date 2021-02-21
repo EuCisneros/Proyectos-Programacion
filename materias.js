@@ -1,4 +1,5 @@
-Vue.component('component-alumnos',{
+Vue.component('v-select-matriculas', VueSelect.VueSelect);
+Vue.component('component-materias',{
     data:()=>{
         return {
             accion : 'nuevo',
@@ -6,27 +7,31 @@ Vue.component('component-alumnos',{
             status : false,
             error  : false,
             buscar : "",
-            alumnos:{
-                idAlumnos : 0,
-                codigo    : '',
-                nombre    : '',
-                direccion : '',
-                telefono  : '',
+            materias:{
+                idMatreias  : 0,
+                matriculas : {
+                    id : 0,
+                    label : '' 
+                },
+                codigo      : '',
+                descripcion : '',
+                precio      : ''
             },
-            alumnos:[]
+            materias:[],
+            matriculas:[]
         }
     },
     methods:{
-        buscandoAlumnos(){
-            this.alumnos = this.alumnos.filter((element,index,alumnos) => element.nombre.toUpperCase().indexOf(this.buscar.toUpperCase())>=0 || element.codigo.toUpperCase().indexOf(this.buscar.toUpperCase())>=0 );
+        buscandoMatrerias(){
+            this.materias = this.materias.filter((element,index,materias) => element.descripcion.toUpperCase().indexOf(this.buscar.toUpperCase())>=0 || element.codigo.toUpperCase().indexOf(this.buscar.toUpperCase())>=0 );
             if( this.buscar.length<=0){
                 this.obtenerDatos();
             }
         },
-        buscandoCodigoAlumnos(store){
+        buscandoCodigoMaterias(store){
             let buscarCodigo = new Promise( (resolver,rechazar)=>{
                 let index = store.index("codigo"),
-                    data = index.get(this.alumnos.codigo);
+                    data = index.get(this.materias.codigo);
                 data.onsuccess=evt=>{
                     resolver(data);
                 };
@@ -36,22 +41,22 @@ Vue.component('component-alumnos',{
             });
             return buscarCodigo;
         },
-        async guardarAlumnos(){
+        async guardarMaterias(){
             /**
              * webSQL -> DB Relacional en el navegador
              * localStorage -> BD NOSQL clave/valor
              * indexedDB -> BD NOSQL clave/valor
              */
-            let store = this.abrirStore("tblalumnos",'readwrite'),
+            let store = this.abrirStore("tblmaterias",'readwrite'),
                 duplicado = false;
             if( this.accion=='nuevo' ){
-                this.alumnos.idAlumnos = generarIdUnicoDesdeFecha();
+                this.materias.idMaterias = generarIdUnicoDesdeFecha();
                 
-                let data = await this.buscandoCodigoAlumnos(store);
+                let data = await this.buscandoCodigoMaterias(store);
                 duplicado = data.result!=undefined;
             }
             if( duplicado==false){
-                let query = store.put(this.alumnos);
+                let query = store.put(this.materias);
                 query.onsuccess=event=>{
                     this.obtenerDatos();
                     this.limpiar();
@@ -63,7 +68,7 @@ Vue.component('component-alumnos',{
                     console.log( event );
                 };
             } else{
-                this.mostrarMsg('Codigo de alumno duplicado',true);
+                this.mostrarMsg('Codigo de materia duplicado',true);
             }
         },
         mostrarMsg(msg, error){
@@ -80,29 +85,39 @@ Vue.component('component-alumnos',{
             }, time*1000);
         },
         obtenerDatos(){
-            let store = this.abrirStore('tblalumnos','readonly'),
+            let store = this.abrirStore('tblmaterias','readonly'),
                 data = store.getAll();
             data.onsuccess=resp=>{
-                this.alumnos = data.result;
+                this.materias = data.result;
+            };
+            let storeMatriculas = this.abrirStore('tblmatriculas','readonly'),
+                dataMaterias = storeMaterias.getAll();
+            this.materias = [];
+            dataMaterias.onsuccess=resp=>{
+                dataMaterias.result.forEach(element => {
+                    this.materias.push({id:element.idCategoria, label:element.descripcion});
+                });
+                
             };
         },
-        mostrarAlumnos(pro){
-            this.alumno = pro;
+        mostrarMaterias(pro){
+            this.materias = pro;
             this.accion='modificar';
         },
         limpiar(){
             this.accion='nuevo';
-            this.alumnos.idAlumnos='';
-            this.alumnos.codigo='';
-            this.alumnos.nombre='';
-            this.alumnos.direccion='';
-            this.alumnos.telefono='';
+            this.materias.matriculas.id=0;
+            this.materias.matriculas.label="";
+            this.materias.idMaterias='';
+            this.materias.codigo='';
+            this.materias.descripcion='';
+            this.materias.precio='';
             this.obtenerDatos();
         },
-        eliminarAlumnos(pro){
-            if( confirm(`Esta seguro que desea eliminar el alumno:  ${pro.descripcion}`) ){
-                let store = this.abrirStore("tblalumnos",'readwrite'),
-                    req = store.delete(pro.idAlumnos);
+        eliminarMatriculas(pro){
+            if( confirm(`Esta seguro que desea eliminar la materia:  ${pro.descripcion}`) ){
+                let store = this.abrirStore("tblmaterias",'readwrite'),
+                    req = store.delete(pro.idMaterias);
                 req.onsuccess=resp=>{
                     this.mostrarMsg('Registro eliminado con exito',true);
                     this.obtenerDatos();
@@ -122,43 +137,43 @@ Vue.component('component-alumnos',{
         //this.obtenerDatos();
     },
     template:`
-        <form v-on:submit.prevent="guardarAlumnos" v-on:reset="limpiar">
+        <form v-on:submit.prevent="guardarMaterias" v-on:reset="limpiar">
             <div class="row">
                 <div class="col-sm-5">
                     <div class="row p-2">
                         <div class="col-sm text-center text-white bg-primary">
                             <div class="row">
                                 <div class="col-11">
-                                    <h5>REGISTRO DE ALUMNOS</h5>
+                                    <h5>REGISTRO DE MATERIAS/h5>
                                 </div>
                                 <div class="col-1 align-middle" >
-                                    <button type="button" onclick="appVue.forms['cliente'].mostrar=false" class="btn-close" aria-label="Close"></button>
+                                    <button type="button" onclick="appVue.forms['materias'].mostrar=false" class="btn-close" aria-label="Close"></button>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="row p-2">
+                        <div class="col-sm">MATRICULAS:</div>
+                        <div class="col-sm">
+                            <v-select-matriculas v-model="materias.matriculas" :options="matriculas" placeholder="Por favor seleccione la matriculas"/>
+                        </div>
+                    </div>
+                    <div class="row p-2">
                         <div class="col-sm">CODIGO:</div>
                         <div class="col-sm">
-                            <input v-model="alumnos.codigo" required type="text" class="form-control form-control-sm" >
+                            <input v-model="materias.codigo" required type="text" class="form-control form-control-sm" >
                         </div>
                     </div>
                     <div class="row p-2">
-                        <div class="col-sm">NOMBRE: </div>
+                        <div class="col-sm">DESCRIPCION: </div>
                         <div class="col-sm">
-                            <input v-model="alumnos.nombre" required pattern="[A-ZÑña-z0-9, ]{5,65}" type="text" class="form-control form-control-sm">
+                            <input v-model="materias.descripcion" required pattern="[A-ZÑña-z0-9, ]{5,65}" type="text" class="form-control form-control-sm">
                         </div>
                     </div>
                     <div class="row p-2">
-                        <div class="col-sm">DIRECCION: </div>
+                        <div class="col-sm">PRECIO:</div>
                         <div class="col-sm">
-                            <input v-model="alumnos.direccion" required pattern="[A-ZÑña-z0-9, ]{5,65}" type="text" class="form-control form-control-sm">
-                        </div>
-                    </div>
-                    <div class="row p-2">
-                        <div class="col-sm">TEL: </div>
-                        <div class="col-sm">
-                            <input v-model="alumnos.telefono" required pattern="[0-9]{4}-[0-9]{4}" type="text" class="form-control form-control-sm">
+                            <input v-model="materias.precio" required pattern="^[0-9](.)+?[0-9]$" type="text" class="form-control form-control-sm">
                         </div>
                     </div>
                     <div class="row p-2">
@@ -178,7 +193,7 @@ Vue.component('component-alumnos',{
                 <div class="col-sm"></div>
                 <div class="col-sm-6 p-2">
                     <div class="row text-center text-white bg-primary">
-                        <div class="col"><h5>ALUMNOS REGISTRADOS</h5></div>
+                        <div class="col"><h5>MATERIAS REGISTRADAS</h5></div>
                     </div>
                     <div class="row">
                         <div class="col">
@@ -186,25 +201,25 @@ Vue.component('component-alumnos',{
                                 <thead>
                                     <tr>
                                         <td colspan="5">
-                                            <input v-model="buscar" v-on:keyup="buscandoCliente" type="text" class="form-control form-contro-sm" placeholder="Buscar clientes">
+                                            <input v-model="buscar" v-on:keyup="buscandoMaterias" type="text" class="form-control form-contro-sm" placeholder="Buscar materias">
                                         </td>
                                     </tr>
                                     <tr>
                                         <th>CODIGO</th>
-                                        <th>NOMBRE</th>
-                                        <th>DIRECCION</th>
-                                        <th>TEL</th>
+                                        <th>DESCRIPCION</th>
+                                        <th>PRECIO</th>
+                                        <th>MATRICULAS</th>
                                         <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="pro in alumnos" v-on:click="mostrarAlumnos(pro)">
+                                    <tr v-for="pro in materias" v-on:click="mostrarMaterias(pro)">
                                         <td>{{ pro.codigo }}</td>
-                                        <td>{{ pro.nombre }}</td>
-                                        <td>{{ pro.direccion }}</td>
-                                        <td>{{ pro.telefono }}</td>
+                                        <td>{{ pro.descripcion }}</td>
+                                        <td>{{ pro.precio }}</td>
+                                        <td>{{ pro.matriculas.label }}</td>
                                         <td>
-                                            <a @click.stop="eliminarAlumnos(pro)" class="btn btn-danger">DEL</a>
+                                            <a @click.stop="eliminarMaterias(pro)" class="btn btn-danger">DEL</a>
                                         </td>
                                     </tr>
                                 </tbody>

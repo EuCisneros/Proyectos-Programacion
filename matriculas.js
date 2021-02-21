@@ -1,4 +1,4 @@
-Vue.component('component-alumnos',{
+Vue.component('component-matriculas',{
     data:()=>{
         return {
             accion : 'nuevo',
@@ -6,27 +6,25 @@ Vue.component('component-alumnos',{
             status : false,
             error  : false,
             buscar : "",
-            alumnos:{
-                idAlumnos : 0,
-                codigo    : '',
-                nombre    : '',
-                direccion : '',
-                telefono  : '',
+            matriculas:{
+                idMatriculas  : 0,
+                codigo      : '',
+                descripcion : ''
             },
-            alumnos:[]
+            matriculas:[]
         }
     },
     methods:{
-        buscandoAlumnos(){
-            this.alumnos = this.alumnos.filter((element,index,alumnos) => element.nombre.toUpperCase().indexOf(this.buscar.toUpperCase())>=0 || element.codigo.toUpperCase().indexOf(this.buscar.toUpperCase())>=0 );
+        buscandoMatriculas(){
+            this.matriculas = this.matriculas.filter((element,index,categorias) => element.descripcion.toUpperCase().indexOf(this.buscar.toUpperCase())>=0 || element.codigo.toUpperCase().indexOf(this.buscar.toUpperCase())>=0 );
             if( this.buscar.length<=0){
                 this.obtenerDatos();
             }
         },
-        buscandoCodigoAlumnos(store){
+        buscandoCodigoMatriculas(store){
             let buscarCodigo = new Promise( (resolver,rechazar)=>{
                 let index = store.index("codigo"),
-                    data = index.get(this.alumnos.codigo);
+                    data = index.get(this.matriculas.codigo);
                 data.onsuccess=evt=>{
                     resolver(data);
                 };
@@ -36,22 +34,22 @@ Vue.component('component-alumnos',{
             });
             return buscarCodigo;
         },
-        async guardarAlumnos(){
+        async guardarMatriculas(){
             /**
              * webSQL -> DB Relacional en el navegador
              * localStorage -> BD NOSQL clave/valor
              * indexedDB -> BD NOSQL clave/valor
              */
-            let store = this.abrirStore("tblalumnos",'readwrite'),
+            let store = this.abrirStore("tblmatriculas",'readwrite'),
                 duplicado = false;
             if( this.accion=='nuevo' ){
-                this.alumnos.idAlumnos = generarIdUnicoDesdeFecha();
+                this.matriculas.idMatriculas = generarIdUnicoDesdeFecha();
                 
-                let data = await this.buscandoCodigoAlumnos(store);
+                let data = await this.buscandoCodigoMatriculas(store);
                 duplicado = data.result!=undefined;
             }
             if( duplicado==false){
-                let query = store.put(this.alumnos);
+                let query = store.put(this.matriculas);
                 query.onsuccess=event=>{
                     this.obtenerDatos();
                     this.limpiar();
@@ -63,7 +61,7 @@ Vue.component('component-alumnos',{
                     console.log( event );
                 };
             } else{
-                this.mostrarMsg('Codigo de alumno duplicado',true);
+                this.mostrarMsg('Codigo de categoria duplicado',true);
             }
         },
         mostrarMsg(msg, error){
@@ -80,29 +78,27 @@ Vue.component('component-alumnos',{
             }, time*1000);
         },
         obtenerDatos(){
-            let store = this.abrirStore('tblalumnos','readonly'),
+            let store = this.abrirStore('tblmatriculas','readonly'),
                 data = store.getAll();
             data.onsuccess=resp=>{
-                this.alumnos = data.result;
+                this.matriculas = data.result;
             };
         },
-        mostrarAlumnos(pro){
-            this.alumno = pro;
+        mostrarMatriculas(pro){
+            this.matriculas = pro;
             this.accion='modificar';
         },
         limpiar(){
             this.accion='nuevo';
-            this.alumnos.idAlumnos='';
-            this.alumnos.codigo='';
-            this.alumnos.nombre='';
-            this.alumnos.direccion='';
-            this.alumnos.telefono='';
+            this.matriculas.idMatriculas='';
+            this.matriculas.codigo='';
+            this.matriculas.descripcion='';
             this.obtenerDatos();
         },
-        eliminarAlumnos(pro){
-            if( confirm(`Esta seguro que desea eliminar el alumno:  ${pro.descripcion}`) ){
-                let store = this.abrirStore("tblalumnos",'readwrite'),
-                    req = store.delete(pro.idAlumnos);
+        eliminarMatriculas(pro){
+            if( confirm(`Esta seguro que desea eliminar el matriculas:  ${pro.descripcion}`) ){
+                let store = this.abrirStore("tblmatriculas",'readwrite'),
+                    req = store.delete(pro.idMatriculas);
                 req.onsuccess=resp=>{
                     this.mostrarMsg('Registro eliminado con exito',true);
                     this.obtenerDatos();
@@ -122,17 +118,17 @@ Vue.component('component-alumnos',{
         //this.obtenerDatos();
     },
     template:`
-        <form v-on:submit.prevent="guardarAlumnos" v-on:reset="limpiar">
+        <form v-on:submit.prevent="guardarMatriculas" v-on:reset="limpiar">
             <div class="row">
                 <div class="col-sm-5">
                     <div class="row p-2">
                         <div class="col-sm text-center text-white bg-primary">
                             <div class="row">
                                 <div class="col-11">
-                                    <h5>REGISTRO DE ALUMNOS</h5>
+                                    <h5>REGISTRO DE MATRICULAS</h5>
                                 </div>
                                 <div class="col-1 align-middle" >
-                                    <button type="button" onclick="appVue.forms['cliente'].mostrar=false" class="btn-close" aria-label="Close"></button>
+                                    <button type="button" onclick="appVue.forms['MATRICULAS'].mostrar=false" class="btn-close" aria-label="Close"></button>
                                 </div>
                             </div>
                         </div>
@@ -140,25 +136,13 @@ Vue.component('component-alumnos',{
                     <div class="row p-2">
                         <div class="col-sm">CODIGO:</div>
                         <div class="col-sm">
-                            <input v-model="alumnos.codigo" required type="text" class="form-control form-control-sm" >
+                            <input v-model="matriculas.codigo" required type="text" class="form-control form-control-sm" >
                         </div>
                     </div>
                     <div class="row p-2">
-                        <div class="col-sm">NOMBRE: </div>
+                        <div class="col-sm">DESCRIPCION: </div>
                         <div class="col-sm">
-                            <input v-model="alumnos.nombre" required pattern="[A-ZÑña-z0-9, ]{5,65}" type="text" class="form-control form-control-sm">
-                        </div>
-                    </div>
-                    <div class="row p-2">
-                        <div class="col-sm">DIRECCION: </div>
-                        <div class="col-sm">
-                            <input v-model="alumnos.direccion" required pattern="[A-ZÑña-z0-9, ]{5,65}" type="text" class="form-control form-control-sm">
-                        </div>
-                    </div>
-                    <div class="row p-2">
-                        <div class="col-sm">TEL: </div>
-                        <div class="col-sm">
-                            <input v-model="alumnos.telefono" required pattern="[0-9]{4}-[0-9]{4}" type="text" class="form-control form-control-sm">
+                            <input v-model="matriculas.descripcion" required pattern="[A-ZÑña-z0-9, ]{5,65}" type="text" class="form-control form-control-sm">
                         </div>
                     </div>
                     <div class="row p-2">
@@ -178,7 +162,7 @@ Vue.component('component-alumnos',{
                 <div class="col-sm"></div>
                 <div class="col-sm-6 p-2">
                     <div class="row text-center text-white bg-primary">
-                        <div class="col"><h5>ALUMNOS REGISTRADOS</h5></div>
+                        <div class="col"><h5>MATRICULAS REGISTRADOS</h5></div>
                     </div>
                     <div class="row">
                         <div class="col">
@@ -186,25 +170,21 @@ Vue.component('component-alumnos',{
                                 <thead>
                                     <tr>
                                         <td colspan="5">
-                                            <input v-model="buscar" v-on:keyup="buscandoCliente" type="text" class="form-control form-contro-sm" placeholder="Buscar clientes">
+                                            <input v-model="buscar" v-on:keyup="buscandoMatriculas" type="text" class="form-control form-contro-sm" placeholder="Buscar matriculas">
                                         </td>
                                     </tr>
                                     <tr>
                                         <th>CODIGO</th>
-                                        <th>NOMBRE</th>
-                                        <th>DIRECCION</th>
-                                        <th>TEL</th>
+                                        <th>DESCRIPCION</th>
                                         <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="pro in alumnos" v-on:click="mostrarAlumnos(pro)">
+                                    <tr v-for="pro in matriculas" v-on:click="mostrarMatriculas(pro)">
                                         <td>{{ pro.codigo }}</td>
-                                        <td>{{ pro.nombre }}</td>
-                                        <td>{{ pro.direccion }}</td>
-                                        <td>{{ pro.telefono }}</td>
+                                        <td>{{ pro.descripcion }}</td>
                                         <td>
-                                            <a @click.stop="eliminarAlumnos(pro)" class="btn btn-danger">DEL</a>
+                                            <a @click.stop="eliminarMatriculas(pro)" class="btn btn-danger">DEL</a>
                                         </td>
                                     </tr>
                                 </tbody>

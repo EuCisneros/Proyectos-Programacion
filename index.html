@@ -1,53 +1,42 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width-device-width,initial-scale=1.0">
-    <title>Sistema Academico</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Escolar</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
     <link rel="stylesheet" href="https://unpkg.com/vue-select@latest/dist/vue-select.css">
-
 </head>
-
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">---SISTEMA ACADEMICO---</a>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link mostrar" data-form="estudiante" href="#">Registro Estudiante</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link mostrar" data-form="docente" href="#">Registro Docente</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link mostrar" data-form="matricula" href="#">Matricula</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link mostrar" data-form="inscripcion" href="#">Inscripciones</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link mostrar" data-form="materias" href="#">Materias</a>
-                    </li>
-                </ul>
-            </div>
+          <a class="navbar-brand" href="#"></a>::. REGISTRO ACADEMICO .::</a>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link mostrar" data-form="matriculas" href="#">Matriculas</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link mostrar" data-form="materias" href="#">Materias</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link mostrar" data-form="alumnos" href="#">Alumnos</a>
+              </li>
+            </ul>
+          </div>
         </div>
-    </nav>
-    <div id="appweb" class="container-fluid">
-        <component-alumnos ref="alumno" v-show="forms['alumno'].mostrar"></component-alumnos>
-        <component-matricula ref="matricula" v-show="forms[matricula].mostrar"></component-matricula>
-        <component-inscripcion ref="inscripcion" v-show="forms['inscripcion'].mostrar"></component-inscripcion>
-        <component-docente ref="docente" v-show="forms['docente'].mostrar"></component-docente>
-        <component-materia ref="materia" v-show="forms['materia'].mostrar"></component-materia>
+      </nav>
+
+    <div id="appSistema" class="container-fluid">
+        <component-materias ref="materias" v-show="forms['materias'].mostrar"></component-materias>
+        <component-matriculas ref="matriculas" v-show="forms['matriculas'].mostrar"></component-matriculas>
+        <component-alumnos ref="alumnos" v-show="forms['alumnos'].mostrar"></component-alumnos>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
     <script src="https://unpkg.com/vue-select@latest"></script>
-    <script src="alumnos.js"></script>
+    <script src="materias.js"></script>
     <script src="matriculas.js"></script>
-    <script src="inscripciones.js"></script>
+    <script src="alumnos.js"></script>
     <script src="main.js"></script>
 </body>
-
 </html>
